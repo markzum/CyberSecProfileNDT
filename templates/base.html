@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CyberSec Crew{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block head_scripts %}{% endblock %}
+</head>
+<body>
+    <div class="background-matrix" aria-hidden="true"></div>
+    <header class="site-header">
+        <div class="logo">CyberSec<span>Profile</span></div>
+        <nav class="main-nav" aria-label="Главная навигация">
+            <a href="{{ url_for('index') }}">Главная</a>
+            <a href="{{ url_for('intro') }}">Интро</a>
+            <a href="{{ url_for('team') }}">Команда</a>
+        </nav>
+        <button class="nav-toggle" type="button" aria-label="Открыть меню">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <p>National Children's Technopark Belarus · InfoSec Profile · {{ current_year }}</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

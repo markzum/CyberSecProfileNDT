@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Команда · CyberSec Crew{% endblock %}
+{% block head_scripts %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.1/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.4/aframe/build/aframe-ar.min.js"></script>
+{% endblock %}
+{% block content %}
+{% set team_members = [
+    {
+        "id": "alice",
+        "title": "Алиса Крипто",
+        "role": "Куратор профиля",
+        "bio": "Отвечает за стратегию обучения, связь с индустрией и фронт исследований.",
+        "links": [
+            {"label": "Telegram", "url": "https://t.me"},
+            {"label": "LinkedIn", "url": "https://www.linkedin.com"}
+        ],
+        "marker": 5,
+        "image": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+        "id": "boris",
+        "title": "Борис OSINT",
+        "role": "Наставник по CTF",
+        "bio": "Придумывает задания, готовит к соревнованиям и ведёт тренировки по анализу угроз.",
+        "links": [
+            {"label": "GitHub", "url": "https://github.com"},
+            {"label": "Twitter", "url": "https://twitter.com"}
+        ],
+        "marker": 12,
+        "image": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+        "id": "daria",
+        "title": "Дарья RedTeam",
+        "role": "Ведущая лабораторий",
+        "bio": "Показывает, как думают пентестеры, строит сложные сценарии атак и обучает защите.",
+        "links": [
+            {"label": "Instagram", "url": "https://instagram.com"},
+            {"label": "YouTube", "url": "https://youtube.com"}
+        ],
+        "marker": 23,
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80"
+    }
+] %}
+<section class="team-page">
+    <div class="team-intro">
+        <h1>Наша команда</h1>
+        <p>Познакомьтесь с наставниками и энтузиастами, которые помогают раскрыть потенциал участников профиля.</p>
+        <button id="activate-ar" class="btn primary">Активировать AR-представление</button>
+    </div>
+    <div class="team-grid">
+        {% for member in team_members %}
+        <article class="team-card">
+            <div class="avatar" style="background-image: url('{{ member.image }}');" role="presentation"></div>
+            <h2>{{ member.title }}</h2>
+            <p class="role">{{ member.role }}</p>
+            <p class="bio">{{ member.bio }}</p>
+            <div class="links">
+                {% for link in member.links %}
+                <a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>
+                {% endfor %}
+            </div>
+            <p class="marker-hint">Маркер AR: #{{ member.marker }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+<div id="ar-overlay" class="ar-overlay" aria-hidden="true">
+    <div class="ar-header">
+        <span>Наведи камеру на AR-маркер команды</span>
+        <button id="close-ar" class="btn ghost" type="button">Закрыть</button>
+    </div>
+    <div class="ar-scene-wrapper">
+        <a-scene id="team-ar-scene" embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+            <a-assets>
+                {% for member in team_members %}
+                <img id="asset-{{ member.id }}" src="{{ member.image }}" crossorigin="anonymous">
+                {% endfor %}
+            </a-assets>
+            {% for member in team_members %}
+            <a-marker type="barcode" value="{{ member.marker }}" data-member="{{ member.id }}">
+                <a-entity position="0 0 0">
+                    <a-plane width="1.8" height="2.4" color="#04110b" opacity="0.92" material="shader: standard; metalness: 0.1; roughness: 0.7"></a-plane>
+                    <a-plane src="#asset-{{ member.id }}" position="0 0.55 0.01" width="1.6" height="1" material="shader: standard; transparent: true"></a-plane>
+                    <a-text value="{{ member.title }}" position="0 1.2 0.02" align="center" width="2.5" color="#0aff9d" shader="msdf" negate="false"></a-text>
+                    <a-text value="{{ member.role }}" position="0 0.2 0.02" align="center" width="2.2" color="#5cffd6" shader="msdf" negate="false"></a-text>
+                </a-entity>
+            </a-marker>
+            {% endfor %}
+            <a-entity camera></a-entity>
+        </a-scene>
+    </div>
+    <div id="ar-card-deck" class="ar-card-deck">
+        {% for member in team_members %}
+        <article class="member-card" id="card-{{ member.id }}" data-member="{{ member.id }}">
+            <div class="member-card__avatar" style="background-image: url('{{ member.image }}');"></div>
+            <div class="member-card__body">
+                <h3>{{ member.title }}</h3>
+                <span class="member-card__role">{{ member.role }}</span>
+                <p>{{ member.bio }}</p>
+                <div class="member-card__links">
+                    {% for link in member.links %}
+                    <a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/team-ar.js') }}" defer></script>
+{% endblock %}
