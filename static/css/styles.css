@@ -307,7 +307,7 @@ body {
     background: rgba(1, 4, 10, 0.85);
 }
 
-.intro-page {
+.presentation-page {
     padding: 6rem 5vw;
     display: grid;
     gap: 2.5rem;
@@ -315,13 +315,13 @@ body {
     align-items: center;
 }
 
-.intro-text h1 {
+.presentation-text h1 {
     font-size: clamp(2rem, 4vw, 3rem);
     margin-bottom: 1rem;
     color: var(--accent);
 }
 
-.intro-text p {
+.presentation-text p {
     color: var(--text-muted);
     line-height: 1.7;
 }
@@ -623,7 +623,7 @@ body {
     }
 
     .hero,
-    .intro-page,
+    .presentation-page,
     .team-page {
         padding: 5rem 1.5rem;
     }

@@ -16,9 +16,9 @@ def create_app() -> Flask:
     def index():
         return render_template("index.html")
 
-    @app.route("/intro")
-    def intro():
-        return render_template("intro.html")
+    @app.route("/presentation")
+    def presentation():
+        return render_template("presentation.html")
 
     @app.route("/team")
     def team():
