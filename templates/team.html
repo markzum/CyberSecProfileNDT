@@ -73,6 +73,76 @@
             text-decoration: underline;
         }
         
+        .social-panel {
+            position: fixed;
+            left: 50%;
+            bottom: -220px;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #00ff88;
+            padding: 16px 20px 18px;
+            border-radius: 18px 18px 0 0;
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 92%;
+            box-shadow: 0 20px 45px rgba(0, 255, 136, 0.15);
+            backdrop-filter: blur(6px);
+            transition: bottom 0.4s ease, opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            will-change: bottom, opacity;
+        }
+
+        .social-panel.visible {
+            bottom: 0;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .social-panel h4 {
+            margin: 0 0 12px 0;
+            color: #ffffff;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+        }
+
+        .social-panel p {
+            margin: 0 0 14px 0;
+            font-size: 13px;
+            color: #9be6c4;
+            letter-spacing: 0.01em;
+        }
+
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.35);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .social-links a:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .social-links a span {
+            color: #00ff88;
+            font-weight: 600;
+        }
+
         /* Адаптация для мобильных устройств */
         @media (max-width: 768px) {
             .info-panel {
@@ -87,6 +157,20 @@
             
             .info-panel p {
                 font-size: 11px;
+            }
+
+            .social-panel {
+                min-width: 240px;
+                padding: 14px 16px 16px;
+            }
+
+            .social-panel h4 {
+                font-size: 14px;
+            }
+
+            .social-links a {
+                font-size: 12px;
+                padding: 7px 10px;
             }
         }
     </style>
@@ -218,20 +302,151 @@
         <p><a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank">📥 Скачать маркер</a></p>
         <p style="font-size: 12px; color: #666; margin-top: 10px;">Разрешите доступ к камере</p>
     </div>
+    <div class="social-panel" id="social-panel" aria-live="polite" aria-hidden="true">
+        <h4 id="social-title">Соцсети специалиста</h4>
+        <p id="social-subtitle">Сканируйте маркер члена команды, чтобы открыть его профиль.</p>
+        <div class="social-links" id="social-links"></div>
+    </div>
         <a-scene embedded arjs vr-mode-ui="enabled: false">
           <a-assets>
             <a-mixin id="team-card" rotation="-90 0 0" scale="1 1 1" team-card></a-mixin>
           </a-assets>
 
-          <a-marker preset="custom" type="pattern" url="/static/markers/person-shield.patt">
+          <a-marker preset="custom" type="pattern" url="/static/markers/person-shield.patt" data-person="person-shield">
             <a-entity mixin="team-card" team-card="photo: /static/images/team/firewall.svg; name: Матвей Дайнеко; role: Incident Responder; description: Руководит операциями по реагированию и ведет форензик расследования в критических инфраструктурах; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
-          <a-marker preset="custom" type="pattern" url="/static/markers/memory.patt">
+          <a-marker preset="custom" type="pattern" url="/static/markers/sync-desktop.patt" data-person="sync-desktop">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/firewall.svg; name: Максим Парипа; role: Incident Responder; description: Белорусский молодой учёный, общественный деятель и предприниматель, известный своими достижениями в области информационных технологий, активной гражданской позицией и вкладом в развитие молодёжной политики Беларуси.; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/memory.patt" data-person="memory">
             <a-entity mixin="team-card" team-card="photo: /static/images/team/osint.svg; name: Марк Мещеряков; role: OSINT Analyst; description: Аналитик данных и специалист по угрозам собирает разведданные из открытых источников и автоматизирует мониторинг; textOffset: -0.22 0.28 0.02"></a-entity>
           </a-marker>
   
           <a-entity camera></a-entity>
         </a-scene>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const socialPanel = document.getElementById('social-panel');
+            const socialTitle = document.getElementById('social-title');
+            const socialSubtitle = document.getElementById('social-subtitle');
+            const socialLinks = document.getElementById('social-links');
+
+            const socialProfiles = {
+                "person-shield": {
+                    name: 'Матвей Дайнеко',
+                    role: 'Incident Responder',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/matvey-dayneko' },
+                        { label: 'GitHub', url: 'https://github.com/mdayneko' },
+                        { label: 'Telegram', url: 'https://t.me/mdayneko' }
+                    ]
+                },
+                "sync-desktop": {
+                    name: 'Максим Парипа',
+                    role: 'Incident Responder',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/maxim-paripa' },
+                        { label: 'GitHub', url: 'https://github.com/mparipa' },
+                        { label: 'Telegram', url: 'https://t.me/mparipa' }
+                    ]
+                },
+                "memory": {
+                    name: 'Марк Мещеряков',
+                    role: 'OSINT Analyst',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/mark-mescheryakov' },
+                        { label: 'GitHub', url: 'https://github.com/mmescheryakov' },
+                        { label: 'Twitter', url: 'https://twitter.com/mark_osint' }
+                    ]
+                }
+            };
+
+            const defaultPanelState = {
+                title: 'Соцсети специалиста',
+                subtitle: 'Сканируйте маркер члена команды, чтобы открыть его профиль.',
+                links: []
+            };
+
+            const panelTransitionMs = 400;
+
+            const activeMarkers = new Set();
+            let currentPersonKey = null;
+            let resetTimer = null;
+
+            const renderLinks = (links) => {
+                socialLinks.innerHTML = '';
+                links.forEach(link => {
+                    const anchor = document.createElement('a');
+                    anchor.href = link.url;
+                    anchor.target = '_blank';
+                    anchor.rel = 'noopener noreferrer';
+                    anchor.innerHTML = `<span>●</span>${link.label}`;
+                    socialLinks.appendChild(anchor);
+                });
+            };
+
+            const setPanelState = ({ title, subtitle, links }) => {
+                socialTitle.textContent = title;
+                socialSubtitle.textContent = subtitle;
+                renderLinks(links);
+            };
+
+            setPanelState(defaultPanelState);
+
+            const showPanel = (personKey) => {
+                if (resetTimer) {
+                    clearTimeout(resetTimer);
+                    resetTimer = null;
+                }
+
+                const profile = socialProfiles[personKey];
+                if (!profile) {
+                    return;
+                }
+
+                setPanelState({ title: profile.name, subtitle: profile.role, links: profile.links });
+                socialPanel.classList.add('visible');
+                socialPanel.setAttribute('aria-hidden', 'false');
+                currentPersonKey = personKey;
+            };
+
+            const hidePanel = () => {
+                socialPanel.classList.remove('visible');
+                socialPanel.setAttribute('aria-hidden', 'true');
+                currentPersonKey = null;
+
+                resetTimer = setTimeout(() => {
+                    if (!socialPanel.classList.contains('visible')) {
+                        setPanelState(defaultPanelState);
+                    }
+                    resetTimer = null;
+                }, panelTransitionMs + 50);
+            };
+
+            document.querySelectorAll('a-marker[data-person]').forEach(marker => {
+                const personKey = marker.dataset.person;
+
+                marker.addEventListener('markerFound', () => {
+                    activeMarkers.add(personKey);
+                    showPanel(personKey);
+                });
+
+                marker.addEventListener('markerLost', () => {
+                    activeMarkers.delete(personKey);
+
+                    if (currentPersonKey === personKey) {
+                        const nextPersonKey = Array.from(activeMarkers).pop();
+                        if (nextPersonKey) {
+                            showPanel(nextPersonKey);
+                        } else {
+                            hidePanel();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
