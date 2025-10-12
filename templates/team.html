@@ -117,6 +117,99 @@
             }
         });
     </script>
+    <script>
+        AFRAME.registerComponent('team-card', {
+            schema: {
+                photo: { type: 'string', default: '/static/images/team/cipher.svg' },
+                name: { type: 'string', default: 'Имя Фамилия' },
+                role: { type: 'string', default: 'Роль' },
+                description: { type: 'string', default: 'Описание специалиста' },
+                textOffset: { type: 'vec3', default: { x: -0.25, y: 0.3, z: 0.02 } }
+            },
+
+            init: function () {
+                this.createElements();
+                this.updateCard();
+            },
+
+            update: function () {
+                if (!this.cardBg) {
+                    this.createElements();
+                }
+                this.updateCard();
+            },
+
+            createElements: function () {
+                const el = this.el;
+
+                this.cardBg = document.createElement('a-plane');
+                this.cardBg.setAttribute('position', '0 0 0');
+                this.cardBg.setAttribute('width', '3');
+                this.cardBg.setAttribute('height', '2');
+                this.cardBg.setAttribute('material', 'src: url(/static/materials/background.svg); shader: flat; side:double; transparent:true; opacity:1; alphaTest:0.05;');
+                this.cardBg.setAttribute('shadow', '');
+                el.appendChild(this.cardBg);
+
+                this.photo = document.createElement('a-image');
+                this.photo.setAttribute('position', '-0.75 0.02 0.02');
+                this.photo.setAttribute('width', '0.72');
+                this.photo.setAttribute('height', '0.72');
+                this.photo.setAttribute('material', 'shader: standard; roughness: 0.4; metalness: 0.15;');
+                this.photo.setAttribute('class', 'no-pointer');
+                this.photo.setAttribute('shadow', '');
+                el.appendChild(this.photo);
+
+                this.name = document.createElement('a-entity');
+                this.name.setAttribute('position', '0 0.55 0.02');
+                el.appendChild(this.name);
+
+                this.textGroup = document.createElement('a-entity');
+                this.textGroup.setAttribute('position', '-0.25 0.3 0.02');
+                el.appendChild(this.textGroup);
+
+                this.role = document.createElement('a-entity');
+                this.role.setAttribute('position', '0 0 0');
+                this.textGroup.appendChild(this.role);
+
+                this.desc = document.createElement('a-entity');
+                this.desc.setAttribute('position', '0 -0.5 0');
+                this.textGroup.appendChild(this.desc);
+
+                this.animation = document.createElement('a-animation');
+                this.animation.setAttribute('attribute', 'scale');
+                this.animation.setAttribute('from', '0 0 0');
+                this.animation.setAttribute('to', '1 1 1');
+                this.animation.setAttribute('dur', '700');
+                this.animation.setAttribute('easing', 'ease-out');
+                el.appendChild(this.animation);
+            },
+
+            updateCard: function () {
+                const data = this.data;
+
+                if (this.photo) {
+                    this.photo.setAttribute('src', data.photo);
+                }
+
+                if (this.name) {
+                    this.name.setAttribute('troika-text', `value: ${data.name}; font: /static/fonts/Exo2.ttf; color: #ff4040; fontSize: 0.14; maxWidth: 1.5; anchor: center; lineHeight: 1.1;`);
+                }
+
+                if (this.role) {
+                    this.role.setAttribute('troika-text', `value: ${data.role}; font: /static/fonts/Exo2.ttf; color: #ff8080; fontSize: 0.12; maxWidth: 1.1; anchor: left; lineHeight: 1.1;`);
+                }
+
+                if (this.desc) {
+                    this.desc.setAttribute('troika-text', `value: ${data.description}; font: /static/fonts/Exo2.ttf; color: #dddddd; fontSize: 0.095; maxWidth: 1.4; anchor: left; lineHeight: 1.25; whiteSpace: normal;`);
+                }
+
+                if (this.textGroup) {
+                    const offset = data.textOffset;
+                    this.textGroup.setAttribute('position', `${offset.x} ${offset.y} ${offset.z}`);
+                }
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="info-panel">
@@ -125,172 +218,20 @@
         <p><a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank">📥 Скачать маркер</a></p>
         <p style="font-size: 12px; color: #666; margin-top: 10px;">Разрешите доступ к камере</p>
     </div>
+        <a-scene embedded arjs vr-mode-ui="enabled: false">
+          <a-assets>
+            <a-mixin id="team-card" rotation="-90 0 0" scale="1 1 1" team-card></a-mixin>
+          </a-assets>
 
+          <a-marker preset="custom" type="pattern" url="/static/markers/person-shield.patt">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/firewall.svg; name: Матвей Дайнеко; role: Incident Responder; description: Руководит операциями по реагированию и ведет форензик расследования в критических инфраструктурах; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
 
-    <!-- embedded 
-        arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false; sourceWidth:640; sourceHeight:480; displayWidth: 640; displayHeight: 480;"
-        vr-mode-ui="enabled: false"
-        renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true; alpha: true;" -->
-
-    <a-scene embedded arjs vr-mode-ui="enabled: false">
-        <a-marker preset="custom" type="pattern" url="/static/markers/memory.patt">
-        <!-- <a-marker preset="hiro"> -->
-            <!-- Карточка члена команды -->
-            <a-entity position="0 0 0" rotation="-90 0 0" scale="1 1 1">
-
-  <!-- 1) Фон карточки: используем SVG data-URI (скруглённые углы + красная обводка) -->
-  <!-- Размеры svg подобраны под ширину/высоту плоскости: мы используем width=1.8 height=1.0 -->
-  <a-plane
-    id="card-bg"
-    position="0 0 0"
-    width="3.0"
-    height="2.0"
-    material="src: url(/static/materials/background.svg); shader: flat; side:double; transparent:true; opacity:1; alphaTest: 0.05;"
-    shadow>
-  </a-plane>
-
-  <!-- 2) Фото (справа & чуть выше центра, на небольшом слое впереди) -->
-  <a-image
-    id="photo"
-    src="/static/images/team/cipher.svg"
-    position="-0.75 0.02 0.02"
-    width="0.72"
-    height="0.72"
-    material="shader: standard; roughness: 0.4; metalness: 0.15;"
-    class="no-pointer"
-    shadow>
-  </a-image>
-
-  <a-entity
-    id="name"
-    troika-text="value: Грищенко Владислав; font: /static/fonts/Exo2.ttf; color: #ff4040; fontSize: 0.14; maxWidth: 1.5; anchor: center; lineHeight: 1.1;"
-    position="0 0.55 0.02">
-  </a-entity>
-
-  <a-entity position="-0.25 0.3 0.02">
-    <a-entity
-      id="role"
-      troika-text="value: Security Engineer; font: /static/fonts/Exo2.ttf; color: #ff8080; fontSize: 0.12; maxWidth: 1.1; anchor: left; lineHeight: 1.1;"
-      position="0 0 0">
-    </a-entity>
-
-    <a-entity
-      id="desc"
-      troika-text="value: Пентестер и аналитик по кибербезопасности. Специализируется на веб-уязвимостях и реагировании на инциденты.; font: /static/fonts/Exo2.ttf; color: #dddddd; fontSize: 0.095; maxWidth: 1.4; anchor: left; lineHeight: 1.25; whiteSpace: normal;"
-      position="0 -0.5 0">
-    </a-entity>
-  </a-entity>
-
-  <!-- Плавное появление всей карточки -->
-  <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="700" easing="ease-out"></a-animation>
-</a-entity>
-
-        </a-marker>
-        
-        <a-entity camera></a-entity>
-    </a-scene>
-
-    <script>
-  (function () {
-    // Ждём загрузки сцены A-Frame
-    window.addEventListener('load', () => {
-      const sceneEl = document.querySelector('a-scene');
-      if (!sceneEl) return;
-
-      // Получаем рендерер/камера/DOM canvas
-      // (на AR.js камера может быть внутри sceneEl.cameraEl)
-      const trySetup = () => {
-        const renderer = sceneEl.renderer;
-        const cameraEl = sceneEl.camera || sceneEl.cameraEl;
-        const camera = (cameraEl && cameraEl.components && cameraEl.components.camera)
-                       ? cameraEl.components.camera.camera
-                       : (sceneEl.camera && sceneEl.camera.camera) ? sceneEl.camera.camera : null;
-        if (!renderer || !camera) {
-          return false;
-        }
-
-        const dom = renderer.domElement;
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        // Собираем объекты, по которым клик возможен
-        const clickableEls = Array.from(sceneEl.querySelectorAll('.clickable'));
-        const meshObjects = () => {
-          const arr = [];
-          clickableEls.forEach(el => {
-            const mesh = el.getObject3D && el.getObject3D('mesh');
-            if (mesh) arr.push(mesh);
-          });
-          return arr;
-        };
-
-        const openGoogle = () => window.open('https://google.com', '_blank');
-
-        // Обработчик касания/клика (работает и на ПК, и на мобильных)
-        const handlePointer = (event) => {
-          event.preventDefault();
-
-          // Поддержка touch и mouse
-          const rect = dom.getBoundingClientRect();
-          let clientX, clientY;
-          if (event.touches && event.touches.length > 0) {
-            clientX = event.touches[0].clientX;
-            clientY = event.touches[0].clientY;
-          } else {
-            clientX = event.clientX;
-            clientY = event.clientY;
-          }
-
-          // Нормализуем координаты в [-1,1]
-          mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-          mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-
-          raycaster.setFromCamera(mouse, camera);
-
-          // Получаем все трехмерные объекты для проверки пересечения
-          const objects = meshObjects();
-          if (objects.length === 0) return;
-
-          const intersects = raycaster.intersectObjects(objects, true);
-          if (intersects.length > 0) {
-            // берём первый пересечённый объект -> ищем соответствующий a-image
-            const hit = intersects[0].object;
-            // из хит-объекта поднимаемся вверх по иерархии — ищем A-Frame элемент
-            let aframeEl = null;
-            clickableEls.forEach(el => {
-              const mesh = el.getObject3D('mesh');
-              if (!mesh) return;
-              if (mesh === hit || mesh.children.includes(hit) || mesh.children.some(c => c === hit || c.children.includes(hit))) {
-                aframeEl = el;
-              }
-            });
-
-            if (aframeEl) {
-              // временно открываем google.com (затем ты заменишь URL)
-              openGoogle();
-            }
-          }
-        };
-
-        // Подписываемся и на touchstart, и на click — это повышает совместимость устройств
-        dom.addEventListener('click', handlePointer, false);
-        dom.addEventListener('touchstart', handlePointer, false);
-
-        return true;
-      };
-
-      // Периодически пытаемся настроиться (AR.js инициализирует сцену немножко позже)
-      const maxAttempts = 20;
-      let attempts = 0;
-      const timer = setInterval(() => {
-        attempts++;
-        if (trySetup() || attempts >= maxAttempts) {
-          clearInterval(timer);
-        }
-      }, 250);
-    });
-  })();
-</script>
-
+          <a-marker preset="custom" type="pattern" url="/static/markers/memory.patt">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/osint.svg; name: Марк Мещеряков; role: OSINT Analyst; description: Аналитик данных и специалист по угрозам собирает разведданные из открытых источников и автоматизирует мониторинг; textOffset: -0.22 0.28 0.02"></a-entity>
+          </a-marker>
+  
+          <a-entity camera></a-entity>
+        </a-scene>
 </body>
 </html>
