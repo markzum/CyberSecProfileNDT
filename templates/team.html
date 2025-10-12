@@ -1,665 +1,332 @@
-<!DOCTYPE html>{% extends "base.html" %}
-
+<!DOCTYPE html>
 <html>
-
-<head>{% block title %}AR Team - CyberSec{% endblock %}
-
+<head>
     <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">{% block head_scripts %}
-
-    <title>AR Team - CyberSec</title><!-- A-Frame и AR.js библиотеки ДОЛЖНЫ быть в head -->
-
-    <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script><script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script><script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-    <style>{% endblock %}
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Team - CyberSec</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-troika-text@0.10.0/dist/aframe-troika-text.min.js"></script>
+    <style>
         body {
-
-            margin: 0;{% block content %}
-
-            overflow: hidden;<div class="ar-container">
-
-            font-family: 'Courier New', monospace;    <div class="ar-instructions" id="instructions">
-
-        }        <div class="instructions-content">
-
-        .info-panel {            <h2>🎯 Инструкция по использованию AR</h2>
-
-            position: fixed;            <ol>
-
-            top: 10px;                <li>Разрешите доступ к камере</li>
-
-            left: 10px;                <li>Наведите камеру на любой из 10 AR-маркеров на стене</li>
-
-            background: rgba(0, 0, 0, 0.9);                <li>Над маркером появится интерактивная карточка члена команды</li>
-
-            color: #00ff88;                <li>Для просмотра всех членов команды - наведитесь на все маркеры по очереди</li>
-
-            padding: 20px;            </ol>
-
-            border-radius: 10px;            <button id="startAR" class="btn-start-ar">Запустить AR 🚀</button>
-
-            border: 2px solid #00ff88;            <div class="marker-info">
-
-            z-index: 999;                <p>💡 Убедитесь, что у вас хорошее освещение и маркеры видны целиком</p>
-
-            max-width: 350px;            </div>
-
-        }        </div>
-
-        .info-panel h2 {    </div>
-
-            margin: 0 0 15px 0;
-
-            font-size: 20px;    <!-- A-Frame AR Scene -->
-
-        }    <a-scene 
-
-        .info-panel p {        id="arScene"
-
-            margin: 5px 0;        embedded 
-
-            font-size: 14px;        arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'
-
-        }        vr-mode-ui="enabled: false"
-
-        .info-panel a {        style="display: none;">
-
-            color: #00ff88;        
-
-            text-decoration: underline;        <!-- Камера -->
-
-        }        <a-entity camera></a-entity>
-
-        .marker-counter {
-
-            position: fixed;        <!-- Маркер 1: CEO / Team Lead -->
-
-            bottom: 20px;        <a-marker type='pattern' url='/static/markers/marker-1.patt'>
-
-            right: 20px;            <a-entity id="card-1" class="ar-card" position="0 0 0">
-
-            background: rgba(0, 0, 0, 0.9);                <!-- Фон карточки -->
-
-            color: #00ff88;                <a-plane 
-
-            padding: 15px 25px;                    position="0 0.5 0" 
-
-            border-radius: 10px;                    rotation="-90 0 0" 
-
-            border: 2px solid #00ff88;                    width="1.5" 
-
-            z-index: 999;                    height="2" 
-
-            font-size: 18px;                    color="#1a1a2e" 
-
-            font-weight: bold;                    material="opacity: 0.95; shader: flat">
-
-        }                </a-plane>
-
-        .back-link {                
-
-            position: fixed;                <!-- Рамка -->
-
-            top: 10px;                <a-plane 
-
-            right: 10px;                    position="0 0.51 0" 
-
-            background: rgba(0, 0, 0, 0.8);                    rotation="-90 0 0" 
-
-            color: #00ff88;                    width="1.52" 
-
-            padding: 10px 20px;                    height="2.02" 
-
-            border-radius: 5px;                    color="#00ff88" 
-
-            text-decoration: none;                    material="opacity: 0.8; shader: flat">
-
-            z-index: 999;                </a-plane>
-
-            border: 1px solid #00ff88;                
-
-        }                <!-- Аватар круг -->
-
-        .back-link:hover {                <a-circle 
-
-            background: rgba(0, 255, 136, 0.2);                    position="0 1.2 0.01" 
-
-        }                    rotation="-90 0 0" 
-
-    </style>                    radius="0.3" 
-
-</head>                    color="#00ff88" 
-
-<body>                    material="shader: flat">
-
-    <a href="/" class="back-link">← Главная</a>                </a-circle>
-
-                    
-
-    <div class="info-panel">                <!-- Имя -->
-
-        <h2>🎯 CyberSec Team AR</h2>                <a-text 
-
-        <p>📱 Наведите камеру на маркеры</p>                    value="Alex Cipher" 
-
-        <p>🎨 Найдено: <span id="found-count">0</span> / 10</p>                    position="-0.6 0.7 0.01" 
-
-        <p style="font-size: 12px; color: #888; margin-top: 10px;">Разрешите доступ к камере при запросе</p>                    rotation="-90 0 0" 
-
-    </div>                    color="#00ff88" 
-
-                    width="1.5" 
-
-    <a-scene embedded arjs vr-mode-ui="enabled: false">                    align="center">
-
-                        </a-text>
-
-        <!-- Маркер 1: CEO / Team Lead -->                
-
-        <a-marker type="pattern" url="/static/markers/marker-1.patt">                <!-- Должность -->
-
-            <a-entity position="0 0 0">                <a-text 
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                    value="CEO / Team Lead" 
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#00ff88" material="opacity: 0.8"></a-plane>                    position="-0.6 0.5 0.01" 
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#00ff88"></a-circle>                    rotation="-90 0 0" 
-
-                <a-text value="Alex Cipher" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#00ff88" width="1.5" align="center"></a-text>                    color="#ffffff" 
-
-                <a-text value="CEO / Team Lead" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>                    width="1.5" 
-
-                <a-text value="Penetration Testing" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>                    scale="0.7 0.7 0.7" 
-
-                <a-text value="CTF Champion 2024" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>                    align="center">
-
-            </a-entity>                </a-text>
-
-        </a-marker>                
-
-                <!-- Описание -->
-
-        <!-- Маркер 2: Security Analyst -->                <a-text 
-
-        <a-marker type="pattern" url="/static/markers/marker-2.patt">                    value="Penetration Testing Expert\nCTF Champion 2024\nOWASP Top 10 Specialist" 
-
-            <a-entity position="0 0 0">                    position="-0.6 0.2 0.01" 
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                    rotation="-90 0 0" 
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#ff6b6b" material="opacity: 0.8"></a-plane>                    color="#cccccc" 
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#ff6b6b"></a-circle>                    width="1.3" 
-
-                <a-text value="Maria Firewall" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#ff6b6b" width="1.5" align="center"></a-text>                    scale="0.5 0.5 0.5" 
-
-                <a-text value="Security Analyst" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>                    align="center">
-
-                <a-text value="Network Security" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>                </a-text>
-
-                <a-text value="IDS/IPS Expert" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>                
-
-            </a-entity>                <!-- Анимация появления -->
-
-        </a-marker>                <a-animation 
-
-                    attribute="scale" 
-
-        <!-- Маркер 3: OSINT Specialist -->                    from="0 0 0" 
-
-        <a-marker type="pattern" url="/static/markers/marker-3.patt">                    to="1 1 1" 
-
-            <a-entity position="0 0 0">                    dur="500" 
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                    easing="ease-out">
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#4ecdc4" material="opacity: 0.8"></a-plane>                </a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#4ecdc4"></a-circle>            </a-entity>
-
-                <a-text value="David OSINT" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#4ecdc4" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="OSINT Specialist" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="Intelligence Gathering" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 2: Security Analyst -->
-
-                <a-text value="Social Engineering" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-2.patt'>
-
-            </a-entity>            <a-entity id="card-2" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#ff6b6b" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <!-- Маркер 4: Malware Analyst -->                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#ff6b6b" material="shader: flat"></a-circle>
-
-        <a-marker type="pattern" url="/static/markers/marker-4.patt">                <a-text value="Maria Firewall" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#ff6b6b" width="1.5" align="center"></a-text>
-
-            <a-entity position="0 0 0">                <a-text value="Security Analyst" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                <a-text value="Network Security Expert\nFirewall Configuration\nIDS/IPS Management" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#9b59b6" material="opacity: 0.8"></a-plane>                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#9b59b6"></a-circle>            </a-entity>
-
-                <a-text value="Sarah Malware" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#9b59b6" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="Malware Analyst" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="Reverse Engineering" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 3: OSINT Specialist -->
-
-                <a-text value="Threat Intelligence" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-3.patt'>
-
-            </a-entity>            <a-entity id="card-3" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#4ecdc4" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <!-- Маркер 5: Forensics Expert -->                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#4ecdc4" material="shader: flat"></a-circle>
-
-        <a-marker type="pattern" url="/static/markers/marker-5.patt">                <a-text value="David OSINT" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#4ecdc4" width="1.5" align="center"></a-text>
-
-            <a-entity position="0 0 0">                <a-text value="OSINT Specialist" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                <a-text value="Open Source Intelligence\nSocial Engineering Defense\nDigital Footprint Analysis" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#f39c12" material="opacity: 0.8"></a-plane>                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#f39c12"></a-circle>            </a-entity>
-
-                <a-text value="John Forensic" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#f39c12" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="Forensics Expert" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="Digital Forensics" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 4: Malware Analyst -->
-
-                <a-text value="Incident Response" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-4.patt'>
-
-            </a-entity>            <a-entity id="card-4" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#9b59b6" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <!-- Маркер 6: Cloud Security -->                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#9b59b6" material="shader: flat"></a-circle>
-
-        <a-marker type="pattern" url="/static/markers/marker-6.patt">                <a-text value="Sarah Malware" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#9b59b6" width="1.5" align="center"></a-text>
-
-            <a-entity position="0 0 0">                <a-text value="Malware Analyst" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                <a-text value="Reverse Engineering\nMalware Detection & Analysis\nThreat Intelligence" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#3498db" material="opacity: 0.8"></a-plane>                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#3498db"></a-circle>            </a-entity>
-
-                <a-text value="Emma Cloud" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#3498db" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="Cloud Security Engineer" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#fff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="AWS/Azure Security" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 5: Forensics Expert -->
-
-                <a-text value="Zero Trust" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-5.patt'>
-
-            </a-entity>            <a-entity id="card-5" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#f39c12" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <!-- Маркер 7: Red Team -->                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#f39c12" material="shader: flat"></a-circle>
-
-        <a-marker type="pattern" url="/static/markers/marker-7.patt">                <a-text value="John Forensic" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#f39c12" width="1.5" align="center"></a-text>
-
-            <a-entity position="0 0 0">                <a-text value="Forensics Expert" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                <a-text value="Digital Forensics\nIncident Response\nEvidence Collection" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#e74c3c" material="opacity: 0.8"></a-plane>                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#e74c3c"></a-circle>            </a-entity>
-
-                <a-text value="Mike RedOps" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#e74c3c" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="Red Team Operator" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="Offensive Security" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 6: Cloud Security Engineer -->
-
-                <a-text value="Exploit Development" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-6.patt'>
-
-            </a-entity>            <a-entity id="card-6" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#3498db" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <!-- Маркер 8: Cryptography -->                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#3498db" material="shader: flat"></a-circle>
-
-        <a-marker type="pattern" url="/static/markers/marker-8.patt">                <a-text value="Emma Cloud" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#3498db" width="1.5" align="center"></a-text>
-
-            <a-entity position="0 0 0">                <a-text value="Cloud Security Engineer" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                <a-text value="AWS/Azure Security\nCloud Architecture\nZero Trust Implementation" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#16a085" material="opacity: 0.8"></a-plane>                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#16a085"></a-circle>            </a-entity>
-
-                <a-text value="Lisa Crypto" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#16a085" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="Cryptography Specialist" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#fff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="Encryption Algorithms" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 7: Red Team Operator -->
-
-                <a-text value="Blockchain Security" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-7.patt'>
-
-            </a-entity>            <a-entity id="card-7" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#e74c3c" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <!-- Маркер 9: Security Architect -->                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#e74c3c" material="shader: flat"></a-circle>
-
-        <a-marker type="pattern" url="/static/markers/marker-9.patt">                <a-text value="Mike RedOps" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#e74c3c" width="1.5" align="center"></a-text>
-
-            <a-entity position="0 0 0">                <a-text value="Red Team Operator" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                <a-text value="Offensive Security\nAdvanced Persistent Threats\nExploit Development" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#d35400" material="opacity: 0.8"></a-plane>                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#d35400"></a-circle>            </a-entity>
-
-                <a-text value="Robert Architect" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#d35400" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="Security Architect" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="Enterprise Security" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 8: Cryptography Specialist -->
-
-                <a-text value="Risk Management" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-8.patt'>
-
-            </a-entity>            <a-entity id="card-8" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#16a085" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <!-- Маркер 10: SOC Analyst -->                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#16a085" material="shader: flat"></a-circle>
-
-        <a-marker type="pattern" url="/static/markers/marker-10.patt">                <a-text value="Lisa Crypto" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#16a085" width="1.5" align="center"></a-text>
-
-            <a-entity position="0 0 0">                <a-text value="Cryptography Specialist" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95"></a-plane>                <a-text value="Encryption Algorithms\nBlockchain Security\nQuantum Cryptography" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#8e44ad" material="opacity: 0.8"></a-plane>                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#8e44ad"></a-circle>            </a-entity>
-
-                <a-text value="Anna SOC" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#8e44ad" width="1.5" align="center"></a-text>        </a-marker>
-
-                <a-text value="SOC Analyst" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                <a-text value="24/7 Monitoring" position="-0.6 0.25 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <!-- Маркер 9: Security Architect -->
-
-                <a-text value="Threat Hunting" position="-0.6 0.1 0.01" rotation="-90 0 0" color="#ccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>        <a-marker type='pattern' url='/static/markers/marker-9.patt'>
-
-            </a-entity>            <a-entity id="card-9" class="ar-card" position="0 0 0">
-
-        </a-marker>                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#d35400" material="opacity: 0.8; shader: flat"></a-plane>
-
-        <a-entity camera></a-entity>                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#d35400" material="shader: flat"></a-circle>
-
-    </a-scene>                <a-text value="Robert Architect" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#d35400" width="1.5" align="center"></a-text>
-
-                <a-text value="Security Architect" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-    <script>                <a-text value="Enterprise Security Design\nCompliance & Governance\nRisk Management" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-        // Простое отслеживание найденных маркеров                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-        let foundCount = 0;            </a-entity>
-
-        const markers = document.querySelectorAll('a-marker');        </a-marker>
-
-        const foundSet = new Set();
-
-                <!-- Маркер 10: SOC Analyst -->
-
-        markers.forEach((marker, index) => {        <a-marker type='pattern' url='/static/markers/marker-10.patt'>
-
-            marker.addEventListener('markerFound', function() {            <a-entity id="card-10" class="ar-card" position="0 0 0">
-
-                const id = index + 1;                <a-plane position="0 0.5 0" rotation="-90 0 0" width="1.5" height="2" color="#1a1a2e" material="opacity: 0.95; shader: flat"></a-plane>
-
-                if (!foundSet.has(id)) {                <a-plane position="0 0.51 0" rotation="-90 0 0" width="1.52" height="2.02" color="#8e44ad" material="opacity: 0.8; shader: flat"></a-plane>
-
-                    foundSet.add(id);                <a-circle position="0 1.2 0.01" rotation="-90 0 0" radius="0.3" color="#8e44ad" material="shader: flat"></a-circle>
-
-                    foundCount++;                <a-text value="Anna SOC" position="-0.6 0.7 0.01" rotation="-90 0 0" color="#8e44ad" width="1.5" align="center"></a-text>
-
-                    document.getElementById('found-count').textContent = foundCount;                <a-text value="SOC Analyst" position="-0.6 0.5 0.01" rotation="-90 0 0" color="#ffffff" width="1.5" scale="0.7 0.7 0.7" align="center"></a-text>
-
-                    console.log('Найден маркер', id);                <a-text value="24/7 Security Monitoring\nSIEM Management\nThreat Hunting" position="-0.6 0.2 0.01" rotation="-90 0 0" color="#cccccc" width="1.3" scale="0.5 0.5 0.5" align="center"></a-text>
-
-                }                <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="500" easing="ease-out"></a-animation>
-
-            });            </a-entity>
-
-        });        </a-marker>
-
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Фикс для AR.js видео на мобильных устройствах */
+        a-scene {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .a-canvas {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* Стили для видео элемента AR.js */
+        video {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            min-width: 100% !important;
+            min-height: 100% !important;
+            width: auto !important;
+            height: auto !important;
+            transform: translate(-50%, -50%) !important;
+            object-fit: cover !important;
+        }
+        
+        .info-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff88;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 999;
+            max-width: 300px;
+        }
+        
+        .info-panel h3 {
+            margin: 0 0 10px 0;
+        }
+        
+        .info-panel p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .info-panel a {
+            color: #00ff88;
+            text-decoration: underline;
+        }
+        
+        /* Адаптация для мобильных устройств */
+        @media (max-width: 768px) {
+            .info-panel {
+                max-width: 200px;
+                padding: 10px;
+                font-size: 12px;
+            }
+            
+            .info-panel h3 {
+                font-size: 14px;
+            }
+            
+            .info-panel p {
+                font-size: 11px;
+            }
+        }
+    </style>
+    <script>
+        // Фикс для видео на мобильных устройствах
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const video = document.querySelector('video');
+                if (video) {
+                    video.style.width = '100%';
+                    video.style.height = '100%';
+                    video.style.objectFit = 'cover';
+                    video.style.position = 'fixed';
+                    video.style.top = '0';
+                    video.style.left = '0';
+                    console.log('Видео настроено для мобильного устройства');
+                }
+            }, 1000);
+        });
+        
+        // Дополнительная проверка при загрузке AR
+        document.addEventListener('camera-init', function() {
+            const video = document.querySelector('video');
+            if (video) {
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.style.objectFit = 'cover';
+            }
+        });
     </script>
-
-</body>    </a-scene>
-
-</html>
-
-    <!-- AR Statistics -->
-    <div id="arStats" class="ar-stats" style="display: none;">
-        <div class="stats-content">
-            <h3>📊 Обнаружено маркеров</h3>
-            <p id="markerCount">0 / 10</p>
-            <div class="found-markers" id="foundMarkers"></div>
-        </div>
+</head>
+<body>
+    <div class="info-panel">
+        <h3>🎯 AR</h3>
+        <p>Наведите камеру на маркер Hiro</p>
+        <p><a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank">📥 Скачать маркер</a></p>
+        <p style="font-size: 12px; color: #666; margin-top: 10px;">Разрешите доступ к камере</p>
     </div>
-</div>
 
-<style>
-.ar-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    background: #0a0a0a;
-}
 
-.ar-instructions {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    animation: fadeIn 0.5s ease-in;
-}
+    <!-- embedded 
+        arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false; sourceWidth:640; sourceHeight:480; displayWidth: 640; displayHeight: 480;"
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true; alpha: true;" -->
 
-.instructions-content {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(0, 255, 136, 0.3);
-    border-radius: 20px;
-    padding: 3rem;
-    max-width: 600px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0, 255, 136, 0.2);
-}
+    <a-scene embedded arjs vr-mode-ui="enabled: false">
+        <a-marker preset="custom" type="pattern" url="/static/markers/memory.patt">
+        <!-- <a-marker preset="hiro"> -->
+            <!-- Карточка члена команды -->
+            <a-entity position="0 0 0" rotation="-90 0 0" scale="1 1 1">
 
-.instructions-content h2 {
-    color: #00ff88;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-}
+  <!-- 1) Фон карточки: используем SVG data-URI (скруглённые углы + красная обводка) -->
+  <!-- Размеры svg подобраны под ширину/высоту плоскости: мы используем width=1.8 height=1.0 -->
+  <a-plane
+    id="card-bg"
+    position="0 0 0"
+    width="3.0"
+    height="2.0"
+    material="src: url(/static/materials/background.svg); shader: flat; side:double; transparent:true; opacity:1; alphaTest: 0.05;"
+    shadow>
+  </a-plane>
 
-.instructions-content ol {
-    text-align: left;
-    color: #ffffff;
-    font-size: 1.1rem;
-    line-height: 2;
-    margin: 2rem 0;
-    padding-left: 2rem;
-}
+  <!-- 2) Фото (справа & чуть выше центра, на небольшом слое впереди) -->
+  <a-image
+    id="photo"
+    src="/static/images/team/cipher.svg"
+    position="-0.75 0.02 0.02"
+    width="0.72"
+    height="0.72"
+    material="shader: standard; roughness: 0.4; metalness: 0.15;"
+    class="no-pointer"
+    shadow>
+  </a-image>
 
-.instructions-content ol li {
-    margin: 1rem 0;
-    padding-left: 0.5rem;
-}
+  <a-entity position="0.25 0 0.02">
+    <a-entity
+      id="name"
+      troika-text="value: Алексей Смирнов; font: /static/fonts/Exo2.ttf; color: #ff4040; fontSize: 0.18; maxWidth: 1.2; anchor: left; lineHeight: 1.1;"
+      position="0 0.26 0">
+    </a-entity>
 
-.btn-start-ar {
-    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
-    color: #000;
-    border: none;
-    padding: 1rem 3rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
-    margin-top: 1rem;
-}
+    <a-entity
+      id="role"
+      troika-text="value: Security Engineer; font: /static/fonts/Exo2.ttf; color: #ff8080; fontSize: 0.12; maxWidth: 1.1; anchor: left; lineHeight: 1.1;"
+      position="0 0.1 0">
+    </a-entity>
 
-.btn-start-ar:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(0, 255, 136, 0.6);
-}
+    <a-entity
+      id="desc"
+      troika-text="value: Пентестер и аналитик по кибербезопасности. Специализируется на веб-уязвимостях и реагировании на инциденты.; font: /static/fonts/Exo2.ttf; color: #dddddd; fontSize: 0.095; maxWidth: 1.15; anchor: left; lineHeight: 1.25; whiteSpace: normal;"
+      position="0 -0.1 0">
+    </a-entity>
+  </a-entity>
 
-.marker-info {
-    margin-top: 2rem;
-    padding: 1rem;
-    background: rgba(0, 255, 136, 0.1);
-    border-radius: 10px;
-    border: 1px solid rgba(0, 255, 136, 0.3);
-}
+  <!-- 4) Иконки соцсетей (справа внизу) — пометь их классом clickable -->
+  <a-entity id="icons" position="0.4 -0.36 0.03">
+    <a-image
+      id="github"
+      class="clickable"
+      src="https://cdn-icons-png.flaticon.com/512/733/733553.png"
+      position="-0.25 0 0"
+      width="0.14"
+      height="0.14"
+      event-set__enter="_event: mouseenter; scale: 0.18 0.18 0.18"
+      event-set__leave="_event: mouseleave; scale: 0.14 0.14 0.14">
+    </a-image>
 
-.marker-info p {
-    color: #00ff88;
-    margin: 0;
-    font-size: 0.95rem;
-}
+    <a-image
+      id="linkedin"
+      class="clickable"
+      src="https://cdn-icons-png.flaticon.com/512/174/174857.png"
+      position="0 0 0"
+      width="0.14"
+      height="0.14"
+      event-set__enter="_event: mouseenter; scale: 0.18 0.18 0.18"
+      event-set__leave="_event: mouseleave; scale: 0.14 0.14 0.14">
+    </a-image>
 
-.ar-stats {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 999;
-    background: rgba(26, 26, 46, 0.9);
-    backdrop-filter: blur(10px);
-    padding: 1.5rem;
-    border-radius: 15px;
-    border: 2px solid rgba(0, 255, 136, 0.3);
-    min-width: 200px;
-}
+    <a-image
+      id="telegram"
+      class="clickable"
+      src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"
+      position="0.25 0 0"
+      width="0.14"
+      height="0.14"
+      event-set__enter="_event: mouseenter; scale: 0.18 0.18 0.18"
+      event-set__leave="_event: mouseleave; scale: 0.14 0.14 0.14">
+    </a-image>
+  </a-entity>
 
-.stats-content h3 {
-    color: #00ff88;
-    font-size: 1rem;
-    margin: 0 0 0.5rem 0;
-    text-align: center;
-}
+  <!-- Плавное появление всей карточки -->
+  <a-animation attribute="scale" from="0 0 0" to="1 1 1" dur="700" easing="ease-out"></a-animation>
+</a-entity>
 
-.stats-content #markerCount {
-    color: #ffffff;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-    margin: 0.5rem 0;
-}
+        </a-marker>
+        
+        <a-entity camera></a-entity>
+    </a-scene>
 
-.found-markers {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 5px;
-    margin-top: 1rem;
-}
+    <script>
+  (function () {
+    // Ждём загрузки сцены A-Frame
+    window.addEventListener('load', () => {
+      const sceneEl = document.querySelector('a-scene');
+      if (!sceneEl) return;
 
-.marker-dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.3s ease;
-}
+      // Получаем рендерер/камера/DOM canvas
+      // (на AR.js камера может быть внутри sceneEl.cameraEl)
+      const trySetup = () => {
+        const renderer = sceneEl.renderer;
+        const cameraEl = sceneEl.camera || sceneEl.cameraEl;
+        const camera = (cameraEl && cameraEl.components && cameraEl.components.camera)
+                       ? cameraEl.components.camera.camera
+                       : (sceneEl.camera && sceneEl.camera.camera) ? sceneEl.camera.camera : null;
+        if (!renderer || !camera) {
+          return false;
+        }
 
-.marker-dot.found {
-    background: #00ff88;
-    border-color: #00ff88;
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
-    animation: pulse 1s ease-in-out;
-}
+        const dom = renderer.domElement;
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
+        // Собираем объекты, по которым клик возможен
+        const clickableEls = Array.from(sceneEl.querySelectorAll('.clickable'));
+        const meshObjects = () => {
+          const arr = [];
+          clickableEls.forEach(el => {
+            const mesh = el.getObject3D && el.getObject3D('mesh');
+            if (mesh) arr.push(mesh);
+          });
+          return arr;
+        };
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-}
+        const openGoogle = () => window.open('https://google.com', '_blank');
 
-/* Адаптив для мобильных */
-@media (max-width: 768px) {
-    .instructions-content {
-        padding: 2rem;
-        margin: 1rem;
-    }
-    
-    .instructions-content h2 {
-        font-size: 1.5rem;
-    }
-    
-    .instructions-content ol {
-        font-size: 1rem;
-    }
-    
-    .btn-start-ar {
-        padding: 0.8rem 2rem;
-        font-size: 1rem;
-    }
-    
-    .ar-stats {
-        top: 10px;
-        right: 10px;
-        padding: 1rem;
-        min-width: 150px;
-    }
-}
-</style>
+        // Обработчик касания/клика (работает и на ПК, и на мобильных)
+        const handlePointer = (event) => {
+          event.preventDefault();
 
-<script src="{{ url_for('static', filename='js/team-ar.js') }}"></script>
+          // Поддержка touch и mouse
+          const rect = dom.getBoundingClientRect();
+          let clientX, clientY;
+          if (event.touches && event.touches.length > 0) {
+            clientX = event.touches[0].clientX;
+            clientY = event.touches[0].clientY;
+          } else {
+            clientX = event.clientX;
+            clientY = event.clientY;
+          }
 
-{% endblock %}
+          // Нормализуем координаты в [-1,1]
+          mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+          raycaster.setFromCamera(mouse, camera);
+
+          // Получаем все трехмерные объекты для проверки пересечения
+          const objects = meshObjects();
+          if (objects.length === 0) return;
+
+          const intersects = raycaster.intersectObjects(objects, true);
+          if (intersects.length > 0) {
+            // берём первый пересечённый объект -> ищем соответствующий a-image
+            const hit = intersects[0].object;
+            // из хит-объекта поднимаемся вверх по иерархии — ищем A-Frame элемент
+            let aframeEl = null;
+            clickableEls.forEach(el => {
+              const mesh = el.getObject3D('mesh');
+              if (!mesh) return;
+              if (mesh === hit || mesh.children.includes(hit) || mesh.children.some(c => c === hit || c.children.includes(hit))) {
+                aframeEl = el;
+              }
+            });
+
+            if (aframeEl) {
+              // временно открываем google.com (затем ты заменишь URL)
+              openGoogle();
+            }
+          }
+        };
+
+        // Подписываемся и на touchstart, и на click — это повышает совместимость устройств
+        dom.addEventListener('click', handlePointer, false);
+        dom.addEventListener('touchstart', handlePointer, false);
+
+        return true;
+      };
+
+      // Периодически пытаемся настроиться (AR.js инициализирует сцену немножко позже)
+      const maxAttempts = 20;
+      let attempts = 0;
+      const timer = setInterval(() => {
+        attempts++;
+        if (trySetup() || attempts >= maxAttempts) {
+          clearInterval(timer);
+        }
+      }, 250);
+    });
+  })();
+</script>
+
+</body>
+</html>
