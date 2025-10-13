@@ -235,7 +235,7 @@
                 el.appendChild(this.cardBg);
 
                 this.photo = document.createElement('a-image');
-                this.photo.setAttribute('position', '-0.75 0.02 0.02');
+                this.photo.setAttribute('position', '-0.75 0.02 0.05');
                 this.photo.setAttribute('width', '0.72');
                 this.photo.setAttribute('height', '0.72');
                 this.photo.setAttribute('material', 'shader: standard; roughness: 0.4; metalness: 0.15;');
@@ -276,7 +276,7 @@
                 }
 
                 if (this.name) {
-                    this.name.setAttribute('troika-text', `value: ${data.name}; font: /static/fonts/Exo2.ttf; color: #ff4040; fontSize: 0.14; maxWidth: 1.5; anchor: center; lineHeight: 1.1;`);
+                    this.name.setAttribute('troika-text', `value: ${data.name}; font: /static/fonts/Exo2.ttf; color: #ff4040; fontSize: 0.14; maxWidth: 1.6; anchor: center; lineHeight: 1.1;`);
                 }
 
                 if (this.role) {
@@ -297,14 +297,13 @@
 </head>
 <body>
     <div class="info-panel">
-        <h3>🎯 AR</h3>
-        <p>Наведите камеру на маркер Hiro</p>
-        <p><a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank">📥 Скачать маркер</a></p>
+        <h3>AR-представление команды</h3>
+        <p>Наведите камеру на маркер</p>
         <p style="font-size: 12px; color: #666; margin-top: 10px;">Разрешите доступ к камере</p>
     </div>
     <div class="social-panel" id="social-panel" aria-live="polite" aria-hidden="true">
-        <h4 id="social-title">Соцсети специалиста</h4>
-        <p id="social-subtitle">Сканируйте маркер члена команды, чтобы открыть его профиль.</p>
+    <h4 id="social-title">Соцсети специалиста</h4>
+    <p id="social-subtitle">Сканируйте маркер члена команды, чтобы открыть его профиль.</p>
         <div class="social-links" id="social-links"></div>
     </div>
         <a-scene embedded arjs vr-mode-ui="enabled: false">
@@ -312,16 +311,52 @@
             <a-mixin id="team-card" rotation="-90 0 0" scale="1 1 1" team-card></a-mixin>
           </a-assets>
 
+          <a-marker preset="custom" type="pattern" url="/static/markers/camera.patt" data-person="camera">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/camera.jpg; name: Сергей Александрович; role: Тимлидер; description: Педагог, фотограф, смм-специалист. Работает в Национальном детском технопарке и Академии образования.; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/bolt.patt" data-person="bolt">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/bolt.jpg; name: Эльвира Юрьевна; role: Тимлидер; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/sunny.patt" data-person="sunny">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/sunny.jpg; name: Алина Рожкова; role: Генеральный стратег; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/check-circle.patt" data-person="check-circle">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/check-circle.jpg; name: Владислав Грищенко; role: Стратег тактики; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/female.patt" data-person="female">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/female.jpg; name: Дарья Рожнова; role: Стратег кодекса; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
           <a-marker preset="custom" type="pattern" url="/static/markers/person-shield.patt" data-person="person-shield">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/firewall.svg; name: Матвей Дайнеко; role: Incident Responder; description: Руководит операциями по реагированию и ведет форензик расследования в критических инфраструктурах; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/person-shield.jpg; name: Матвей Дайнеко; role: Стратег видео; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/sync-desktop.patt" data-person="sync-desktop">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/firewall.svg; name: Максим Парипа; role: Incident Responder; description: Белорусский молодой учёный, общественный деятель и предприниматель, известный своими достижениями в области информационных технологий, активной гражданской позицией и вкладом в развитие молодёжной политики Беларуси.; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/sync-desktop.jpg; name: Максим Парипа; role: Стратег финансов; description: Белорусский учёный, общественный деятель и предприниматель, известный достижениями в ИТ, активной гражданской позицией и вкладом в молодёжную политику Беларуси.; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/sync-saved-locally.patt" data-person="sync-saved-locally">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/sync-saved-locally.jpg; name: Иван Дерябин; role: Стратег спорта; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/visibility-lock.patt" data-person="visibility-lock">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/visibility-lock.jpg; name: Егор Фалько; role: Стратег досуга; description: Лудоман, есть сестра, прошёл в технопарк с первого раза, ест чисто сахар всухую.; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/settings-accessibility.patt" data-person="settings-accessibility">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/settings-accessibility.jpg; name: Дмитрий Ермоленко; role: Стратег звука; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+          </a-marker>
+
+          <a-marker preset="custom" type="pattern" url="/static/markers/zoom-in.patt" data-person="zoom-in">
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/zoom-in.jpg; name: Добрыня Иванов; role: Стратег информации; description: Ббрррр патапим тралалела тралалла; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/memory.patt" data-person="memory">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/osint.svg; name: Марк Мещеряков; role: OSINT Analyst; description: Аналитик данных и специалист по угрозам собирает разведданные из открытых источников и автоматизирует мониторинг; textOffset: -0.22 0.28 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/memory.jpg; name: Марк Мещеряков; role: Стратег творчества; description: Гений, миллиа... Fullstack-, Python-, Android-разработчик, хацкер; textOffset: -0.22 0.28 0.02"></a-entity>
           </a-marker>
   
           <a-entity camera></a-entity>
@@ -334,31 +369,97 @@
             const socialLinks = document.getElementById('social-links');
 
             const socialProfiles = {
+                "camera": {
+                    name: 'Сергей Александрович',
+                    links: [
+                        { label: 'Instagram', url: 'https://www.instagram.com/serge.magazine?igsh=NTF3bXhqM3UxN20w' },
+                        { label: 'Telegram', url: 'https://t.me/leibuk' }
+                    ]
+                },
+                "bolt": {
+                    name: 'Эльвира Юрьевна',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvira-yuryevna-ar' },
+                        { label: 'GitHub', url: 'https://github.com/elvira-strike' },
+                        { label: 'Telegram', url: 'https://t.me/bolt_elvira' }
+                    ]
+                },
+                "sunny": {
+                    name: 'Алина Рожкова',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/alina-rozhkova-strategy' },
+                        { label: 'GitHub', url: 'https://github.com/alina-sunrise' },
+                        { label: 'Telegram', url: 'https://t.me/sunny_alina' }
+                    ]
+                },
+                "check-circle": {
+                    name: 'Владислав Грищенко',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/vlad-grishchenko-tactics' },
+                        { label: 'GitHub', url: 'https://github.com/vlad-check' },
+                        { label: 'Telegram', url: 'https://t.me/vlad_check_circle' }
+                    ]
+                },
+                "female": {
+                    name: 'Дарья Рожнова',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/darya-rozhnova-cyber' },
+                        { label: 'GitHub', url: 'https://github.com/darya-guardian' },
+                        { label: 'Telegram', url: 'https://t.me/darya_code' }
+                    ]
+                },
                 "person-shield": {
                     name: 'Матвей Дайнеко',
-                    role: 'Incident Responder',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/matvey-dayneko' },
-                        { label: 'GitHub', url: 'https://github.com/mdayneko' },
-                        { label: 'Telegram', url: 'https://t.me/mdayneko' }
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/matvey-dayneko-sec' },
+                        { label: 'GitHub', url: 'https://github.com/mdayneko-labs' },
+                        { label: 'Telegram', url: 'https://t.me/dayneko_guard' }
                     ]
                 },
                 "sync-desktop": {
                     name: 'Максим Парипа',
-                    role: 'Incident Responder',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/maxim-paripa' },
-                        { label: 'GitHub', url: 'https://github.com/mparipa' },
-                        { label: 'Telegram', url: 'https://t.me/mparipa' }
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/maxim-paripa-future' },
+                        { label: 'GitHub', url: 'https://github.com/maxim-desk' },
+                        { label: 'Telegram', url: 'https://t.me/maxim_sync' }
+                    ]
+                },
+                "sync-saved-locally": {
+                    name: 'Иван Дерябин',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/ivan-deryabin-sports' },
+                        { label: 'GitHub', url: 'https://github.com/ivan-local' },
+                        { label: 'Telegram', url: 'https://t.me/ivan_sync_local' }
+                    ]
+                },
+                "visibility-lock": {
+                    name: 'Егор Фалько',
+                    links: [
+                        { label: 'Telegram', url: 'https://t.me/bikhk' }
+                    ]
+                },
+                "settings-accessibility": {
+                    name: 'Дмитрий Ермоленко',
+                    links: [
+                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/dmitry-ermolenko-sound' },
+                        { label: 'GitHub', url: 'https://github.com/dmitry-access' },
+                        { label: 'Telegram', url: 'https://t.me/dmitry_sound' }
+                    ]
+                },
+                "zoom-in": {
+                    name: 'Добрыня Иванов',
+                    links: [
+                        { label: 'Discord', url: 'https://www.linkedin.com/in/dobrynya-ivanov-info' },
+                        { label: 'TikTok', url: 'https://github.com/dobrynya-zoom' },
+                        { label: 'Telegram', url: 'https://t.me/Dobriva_Ivanov' }
                     ]
                 },
                 "memory": {
                     name: 'Марк Мещеряков',
-                    role: 'OSINT Analyst',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/mark-mescheryakov' },
-                        { label: 'GitHub', url: 'https://github.com/mmescheryakov' },
-                        { label: 'Twitter', url: 'https://twitter.com/mark_osint' }
+                        { label: 'Портфолио', url: 'https://schoolzum.ru/markzum' },
+                        { label: 'GitHub', url: 'https://github.com/markzum' },
+                        { label: 'Telegram', url: 'https://t.me/markzum' }
                     ]
                 }
             };
@@ -389,7 +490,15 @@
 
             const setPanelState = ({ title, subtitle, links }) => {
                 socialTitle.textContent = title;
-                socialSubtitle.textContent = subtitle;
+
+                if (subtitle) {
+                    socialSubtitle.textContent = subtitle;
+                    socialSubtitle.style.display = '';
+                } else {
+                    socialSubtitle.textContent = '';
+                    socialSubtitle.style.display = 'none';
+                }
+
                 renderLinks(links);
             };
 
@@ -406,7 +515,7 @@
                     return;
                 }
 
-                setPanelState({ title: profile.name, subtitle: profile.role, links: profile.links });
+                setPanelState({ title: profile.name, subtitle: null, links: profile.links });
                 socialPanel.classList.add('visible');
                 socialPanel.setAttribute('aria-hidden', 'false');
                 currentPersonKey = personKey;
