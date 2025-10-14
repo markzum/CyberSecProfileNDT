@@ -262,7 +262,19 @@
                 this.animation = document.createElement('a-animation');
                 this.animation.setAttribute('attribute', 'scale');
                 this.animation.setAttribute('from', '0 0 0');
-                this.animation.setAttribute('to', '1 1 1');
+
+                const currentScale = this.el.getAttribute('scale');
+                let targetScale = '1 1 1';
+
+                if (currentScale) {
+                    if (typeof currentScale === 'object') {
+                        targetScale = `${currentScale.x} ${currentScale.y} ${currentScale.z}`;
+                    } else {
+                        targetScale = currentScale;
+                    }
+                }
+
+                this.animation.setAttribute('to', targetScale);
                 this.animation.setAttribute('dur', '700');
                 this.animation.setAttribute('easing', 'ease-out');
                 el.appendChild(this.animation);
@@ -280,7 +292,7 @@
                 }
 
                 if (this.role) {
-                    this.role.setAttribute('troika-text', `value: ${data.role}; font: /static/fonts/Exo2.ttf; color: #ff8080; fontSize: 0.12; maxWidth: 1.1; anchor: left; lineHeight: 1.1;`);
+                    this.role.setAttribute('troika-text', `value: ${data.role}; font: /static/fonts/Exo2.ttf; color: #ff8080; fontSize: 0.12; maxWidth: 1.3; anchor: left; lineHeight: 1.1;`);
                 }
 
                 if (this.desc) {
@@ -293,6 +305,125 @@
                 }
             }
         });
+    </script>
+    <script>
+        (function () {
+            const baseScales = new WeakMap();
+
+            const parseScale = (value) => {
+                if (!value) {
+                    return { x: 1, y: 1, z: 1 };
+                }
+
+                if (typeof value === 'object') {
+                    const { x = 1, y = 1, z = 1 } = value;
+                    return {
+                        x: Number.isFinite(+x) ? +x : 1,
+                        y: Number.isFinite(+y) ? +y : 1,
+                        z: Number.isFinite(+z) ? +z : 1
+                    };
+                }
+
+                if (typeof value === 'string') {
+                    const [sx = '1', sy = '1', sz = '1'] = value.trim().split(/\s+/);
+                    return {
+                        x: Number.parseFloat(sx) || 1,
+                        y: Number.parseFloat(sy) || 1,
+                        z: Number.parseFloat(sz) || 1
+                    };
+                }
+
+                return { x: 1, y: 1, z: 1 };
+            };
+
+            const captureBaseScale = (entity) => {
+                if (baseScales.has(entity)) {
+                    return baseScales.get(entity);
+                }
+
+                const scaleAttr = entity.getAttribute('scale');
+                const scale = parseScale(scaleAttr);
+                baseScales.set(entity, scale);
+                return scale;
+            };
+
+            const computeScale = () => {
+                const width = window.innerWidth || 1;
+                const height = window.innerHeight || 1;
+                const aspect = width / height;
+                const shortestSide = Math.min(width, height);
+
+                let widthBoost = 1.08;
+
+                if (aspect < 0.9) {
+                    widthBoost *= Math.min(1.2, 0.92 / Math.max(aspect, 0.55));
+                } else if (aspect > 1.6) {
+                    widthBoost *= 1.05;
+                }
+
+                let uniformFactor = 1;
+
+                if (shortestSide <= 360) {
+                    uniformFactor = 0.85;
+                } else if (shortestSide <= 430) {
+                    uniformFactor = 0.9;
+                } else if (shortestSide <= 540) {
+                    uniformFactor = 0.95;
+                } else if (shortestSide <= 680) {
+                    uniformFactor = 0.98;
+                }
+
+                return { widthBoost, uniformFactor };
+            };
+
+            const applyScale = () => {
+                const { widthBoost, uniformFactor } = computeScale();
+                const entities = document.querySelectorAll('a-entity[team-card]');
+
+                entities.forEach((entity) => {
+                    const base = captureBaseScale(entity);
+                    const object3D = entity.object3D;
+
+                    if (!object3D || !object3D.scale) {
+                        return;
+                    }
+
+                    const scale = {
+                        x: base.x * widthBoost * uniformFactor,
+                        y: base.y * uniformFactor,
+                        z: base.z * uniformFactor
+                    };
+
+                    object3D.scale.set(scale.x, scale.y, scale.z);
+                    entity.setAttribute('scale', `${scale.x} ${scale.y} ${scale.z}`);
+                });
+            };
+
+            const scheduleScale = () => {
+                requestAnimationFrame(() => {
+                    applyScale();
+                    setTimeout(applyScale, 220);
+                });
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const scene = document.querySelector('a-scene');
+
+                if (scene) {
+                    if (scene.hasLoaded) {
+                        scheduleScale();
+                    } else {
+                        scene.addEventListener('loaded', scheduleScale, { once: true });
+                    }
+                } else {
+                    scheduleScale();
+                }
+            });
+
+            window.addEventListener('resize', scheduleScale);
+            window.addEventListener('orientationchange', scheduleScale);
+            document.addEventListener('camera-init', scheduleScale);
+        })();
     </script>
 </head>
 <body>
@@ -308,7 +439,7 @@
     </div>
         <a-scene embedded arjs vr-mode-ui="enabled: false">
           <a-assets>
-            <a-mixin id="team-card" rotation="-90 0 0" scale="1 1 1" team-card></a-mixin>
+              <a-mixin id="team-card" rotation="-90 0 0" scale="2.6 1.6 1.6" team-card></a-mixin>
           </a-assets>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/camera.patt" data-person="camera">
@@ -316,31 +447,31 @@
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/bolt.patt" data-person="bolt">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/bolt.jpg; name: Эльвира Юрьевна; role: Тимлидер; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/bolt.jpg; name: Эльвира Юрьевна; role: Тимлидер; description: Супер-тимлидер!; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/sunny.patt" data-person="sunny">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/sunny.jpg; name: Алина Рожкова; role: Генеральный стратег; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/sunny.jpg; name: Алина Рожкова; role: Генеральный стратег; description: 她喜欢学汉语和喝中国茶; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/check-circle.patt" data-person="check-circle">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/check-circle.jpg; name: Владислав Грищенко; role: Стратег тактики; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/check-circle.jpg; name: Владислав Грищенко; role: Стратег тактики; description: Описание отсутствует; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/female.patt" data-person="female">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/female.jpg; name: Дарья Рожнова; role: Стратег кодекса; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/female.jpg; name: Дарья Рожнова; role: Стратег кодекса; description: Девочка из Тюмени, любит вязать и кошек прогает, изучает всякое интересное и живёт свою лучшую жизнь (пытается по крайней мере...); textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/person-shield.patt" data-person="person-shield">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/person-shield.jpg; name: Матвей Дайнеко; role: Стратег видео; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/person-shield.jpg; name: Матвей Дайнеко; role: Стратег видео; description: Нам природа дарит смысл, мы сполна его берем.; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/sync-desktop.patt" data-person="sync-desktop">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/sync-desktop.jpg; name: Максим Парипа; role: Стратег финансов; description: Белорусский учёный, общественный деятель и предприниматель, известный достижениями в ИТ, активной гражданской позицией и вкладом в молодёжную политику Беларуси.; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/sync-desktop.jpg; name: Максим Палыч Парипа; role: Стратег финансов; description: Белорусский учёный, общественный деятель и предприниматель, известный достижениями в ИТ, активной гражданской позицией и вкладом в молодёжную политику Беларуси.; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/sync-saved-locally.patt" data-person="sync-saved-locally">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/sync-saved-locally.jpg; name: Иван Дерябин; role: Стратег спорта; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/sync-saved-locally.jpg; name: Иван Дерябин; role: Стратег спорта; description: *Засекречен*; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/visibility-lock.patt" data-person="visibility-lock">
@@ -348,7 +479,7 @@
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/settings-accessibility.patt" data-person="settings-accessibility">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/settings-accessibility.jpg; name: Дмитрий Ермоленко; role: Стратег звука; description: ; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/settings-accessibility.jpg; name: Дмитрий Ермоленко; role: Стратег звука; description: 404. Описание не найдено; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/zoom-in.patt" data-person="zoom-in">
@@ -379,85 +510,79 @@
                 "bolt": {
                     name: 'Эльвира Юрьевна',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/elvira-yuryevna-ar' },
-                        { label: 'GitHub', url: 'https://github.com/elvira-strike' },
-                        { label: 'Telegram', url: 'https://t.me/bolt_elvira' }
+                        { label: 'Instagram', url: 'https://www.instagram.com/_lux_loxx' }
                     ]
                 },
                 "sunny": {
                     name: 'Алина Рожкова',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/alina-rozhkova-strategy' },
-                        { label: 'GitHub', url: 'https://github.com/alina-sunrise' },
-                        { label: 'Telegram', url: 'https://t.me/sunny_alina' }
+                        { label: 'Instagram', url: 'https://www.instagram.com/aliinsse' },
+                        { label: 'Telegram', url: 'https://t.me/aliinsse' }
                     ]
                 },
-                "check-circle": {
+                /*"check-circle": {
                     name: 'Владислав Грищенко',
                     links: [
                         { label: 'LinkedIn', url: 'https://www.linkedin.com/in/vlad-grishchenko-tactics' },
                         { label: 'GitHub', url: 'https://github.com/vlad-check' },
                         { label: 'Telegram', url: 'https://t.me/vlad_check_circle' }
                     ]
-                },
+                },*/
                 "female": {
                     name: 'Дарья Рожнова',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/darya-rozhnova-cyber' },
-                        { label: 'GitHub', url: 'https://github.com/darya-guardian' },
-                        { label: 'Telegram', url: 'https://t.me/darya_code' }
+                        { label: 'VK', url: 'https://vk.com/dmeowd' },
+                        { label: 'Telegram', url: 'https://t.me/dmeowd' }
                     ]
                 },
-                "person-shield": {
+                /*"person-shield": {
                     name: 'Матвей Дайнеко',
                     links: [
                         { label: 'LinkedIn', url: 'https://www.linkedin.com/in/matvey-dayneko-sec' },
                         { label: 'GitHub', url: 'https://github.com/mdayneko-labs' },
                         { label: 'Telegram', url: 'https://t.me/dayneko_guard' }
                     ]
-                },
+                },*/
                 "sync-desktop": {
                     name: 'Максим Парипа',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/maxim-paripa-future' },
-                        { label: 'GitHub', url: 'https://github.com/maxim-desk' },
-                        { label: 'Telegram', url: 'https://t.me/maxim_sync' }
+                        { label: 'Telegram', url: 'https://t.me/maksim_paripa' }
                     ]
                 },
-                "sync-saved-locally": {
+                /*"sync-saved-locally": {
                     name: 'Иван Дерябин',
                     links: [
                         { label: 'LinkedIn', url: 'https://www.linkedin.com/in/ivan-deryabin-sports' },
                         { label: 'GitHub', url: 'https://github.com/ivan-local' },
                         { label: 'Telegram', url: 'https://t.me/ivan_sync_local' }
                     ]
-                },
+                },*/
                 "visibility-lock": {
                     name: 'Егор Фалько',
                     links: [
                         { label: 'Telegram', url: 'https://t.me/bikhk' }
                     ]
                 },
-                "settings-accessibility": {
+                /*"settings-accessibility": {
                     name: 'Дмитрий Ермоленко',
                     links: [
                         { label: 'LinkedIn', url: 'https://www.linkedin.com/in/dmitry-ermolenko-sound' },
                         { label: 'GitHub', url: 'https://github.com/dmitry-access' },
                         { label: 'Telegram', url: 'https://t.me/dmitry_sound' }
                     ]
-                },
+                },*/
                 "zoom-in": {
                     name: 'Добрыня Иванов',
                     links: [
-                        { label: 'Discord', url: 'https://www.linkedin.com/in/dobrynya-ivanov-info' },
-                        { label: 'TikTok', url: 'https://github.com/dobrynya-zoom' },
+                        //{ label: 'Discord', url: 'https://www.linkedin.com/in/dobrynya-ivanov-info' },
+                        //{ label: 'TikTok', url: 'https://github.com/dobrynya-zoom' },
                         { label: 'Telegram', url: 'https://t.me/Dobriva_Ivanov' }
                     ]
                 },
                 "memory": {
                     name: 'Марк Мещеряков',
                     links: [
-                        { label: 'Портфолио', url: 'https://schoolzum.ru/markzum' },
+                        { label: 'Portfolio', url: 'https://schoolzum.ru/markzum' },
                         { label: 'GitHub', url: 'https://github.com/markzum' },
                         { label: 'Telegram', url: 'https://t.me/markzum' }
                     ]
