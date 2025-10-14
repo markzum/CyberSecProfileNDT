@@ -2,11 +2,11 @@
 <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <linearGradient id="gradFirewall" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#0aff9d" />
-            <stop offset="100%" stop-color="#02121c" />
+            <stop offset="0%" stop-color="#e60026" />
+            <stop offset="100%" stop-color="#260000" />
         </linearGradient>
     </defs>
     <rect width="400" height="400" rx="40" fill="url(#gradFirewall)" />
-    <text x="50%" y="55%" text-anchor="middle" font-family="'Chakra Petch', 'JetBrains Mono', monospace" font-weight="700" font-size="120" fill="#001a14">FW</text>
-    <text x="50%" y="75%" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="32" fill="#eafff6" letter-spacing="6">FIREWALL</text>
+    <text x="50%" y="55%" text-anchor="middle" font-family="'Chakra Petch', 'JetBrains Mono', monospace" font-weight="700" font-size="120" fill="#1a0003">FW</text>
+    <text x="50%" y="75%" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="32" fill="#ffe1d6" letter-spacing="6">FIREWALL</text>
 </svg>

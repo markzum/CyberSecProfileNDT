@@ -6,13 +6,16 @@
         <h1 class="glitch" data-text="CyberSec Crew">CyberSec Crew</h1>
         <p class="tagline">Профиль информационной безопасности Национального детского технопарка Беларуси</p>
         <div class="cta-buttons">
-            <a class="btn primary" href="{{ url_for('presentation') }}">Презентация</a>
+            <!--<a class="btn primary" href="{{ url_for('presentation') }}">Презентация</a>-->
+            <a class="btn secondary" href="{{ url_for('presentation') }}">Презентация</a>
+            <a class="btn secondary" href="{{ url_for('trailer') }}">Трейлер</a>
             <a class="btn secondary" href="{{ url_for('team') }}">Команда</a>
         </div>
     </div>
     <div class="hero-visual" aria-hidden="true">
         <div class="orbital-grid"></div>
         <div class="code-rain"></div>
+        <img src="{{ url_for('static', filename='images/all-team1.jpg') }}" alt="Вся команда" class="team-image">
     </div>
 </section>
 <section class="highlights">
@@ -22,7 +25,7 @@
     </article>
     <article class="highlight-card">
         <h2>Экспертиза</h2>
-        <p>От криптографии и OSINT до безопасной разработки — мы погружаемся в реальные сценарии и решаем настоящие задачки.</p>
+        <p>От криптографии и сетей до безопасной разработки и ИИ — мы погружаемся в реальные сценарии и решаем настоящие задачи.</p>
     </article>
     <article class="highlight-card">
         <h2>Коммьюнити</h2>

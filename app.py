@@ -20,13 +20,14 @@ def create_app() -> Flask:
     def presentation():
         return render_template("presentation.html")
 
+    @app.route("/trailer")
+    def trailer():
+        pass
+        # return render_template("trailer.html")
+
     @app.route("/team")
     def team():
         return render_template("team.html")
-
-    @app.route("/team-demo")
-    def team_demo():
-        return render_template("team-demo.html")
 
     return app
 
@@ -50,6 +51,5 @@ if __name__ == "__main__":
     else:
         # Обычный запуск
         print("🚀 Запуск сервера...")
-        print("📱 Демо: http://127.0.0.1:3750/team-demo")
         print("🎯 Полная версия: http://127.0.0.1:3750/team")
         app.run(host="127.0.0.1", port=3750, debug=True)
