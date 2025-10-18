@@ -145,7 +145,9 @@ TEAM_MEMBERS = [
         "marker": "zoom-in.patt",
         "text_offset": "-0.28 0.32 0.02",
         "socials": [
-            {"label": "Telegram", "url": "https://t.me/Dobriva_Ivanov"},
+            {"label": "Instagram", "url": "https://www.instagram.com/dobrynia.14"},
+            {"label": "Discord", "url": "https://discord.com/users/pelmen06896"},
+            {"label": "TikTok", "url": "https://www.tiktok.com/@_dobrynia_14"},
         ],
     },
     {
