@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Трейлер · CyberSec Crew{% endblock %}
+{% block content %}
+<section class="presentation-page">
+    <div class="presentation-text">
+        <h1>Трейлер от Народного единства</h1>
+        <p>Архитектура и дизайн, Энергетика будущего и Информационная безопасность объединились в единый округ, чтобы изменить мир.</p>
+    </div>
+    <div class="video-frame">
+        <video controls>
+            <source src="{{ url_for('big_files', filename='trailer.mp4') }}" type="video/mp4">
+            Ваш браузер не поддерживает воспроизведение видео.
+        </video>
+    </div>
+</section>
+{% endblock %}

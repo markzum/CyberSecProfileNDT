@@ -439,7 +439,7 @@
     </div>
         <a-scene embedded arjs vr-mode-ui="enabled: false">
           <a-assets>
-              <a-mixin id="team-card" rotation="-90 0 0" scale="2.6 1.6 1.6" team-card></a-mixin>
+              <a-mixin id="team-card" rotation="-90 0 0" scale="3.8 2.6 2.6" team-card></a-mixin>
           </a-assets>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/camera.patt" data-person="camera">
@@ -451,11 +451,11 @@
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/sunny.patt" data-person="sunny">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/sunny.jpg; name: Алина Рожкова; role: Генеральный стратег; description: 她喜欢学汉语和喝中国茶; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/sunny.jpg; name: Алина Рожкова; role: Генеральный стратег; description: Самый крутой стратег тактики и по совместительству духовный лидер информационной безопасности; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/check-circle.patt" data-person="check-circle">
-            <a-entity mixin="team-card" team-card="photo: /static/images/team/check-circle.jpg; name: Владислав Грищенко; role: Стратег тактики; description: Описание отсутствует; textOffset: -0.28 0.32 0.02"></a-entity>
+            <a-entity mixin="team-card" team-card="photo: /static/images/team/check-circle.jpg; name: Владислав Грищенко; role: Стратег тактики; description: Самый крутой стратег тактики и духовный лидер команды; textOffset: -0.28 0.32 0.02"></a-entity>
           </a-marker>
 
           <a-marker preset="custom" type="pattern" url="/static/markers/female.patt" data-person="female">
@@ -520,14 +520,13 @@
                         { label: 'Telegram', url: 'https://t.me/aliinsse' }
                     ]
                 },
-                /*"check-circle": {
+                "check-circle": {
                     name: 'Владислав Грищенко',
                     links: [
-                        { label: 'LinkedIn', url: 'https://www.linkedin.com/in/vlad-grishchenko-tactics' },
-                        { label: 'GitHub', url: 'https://github.com/vlad-check' },
-                        { label: 'Telegram', url: 'https://t.me/vlad_check_circle' }
+                        { label: 'Instagram', url: 'https://www.instagram.com/grvlad2008' },
+                        { label: 'Telegram', url: 'https://t.me/v1arr' }
                     ]
-                },*/
+                },
                 "female": {
                     name: 'Дарья Рожнова',
                     links: [
