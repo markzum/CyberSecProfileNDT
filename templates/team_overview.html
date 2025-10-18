@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Команда · CyberSec Crew{% endblock %}
+{% block content %}
+<section class="team-page" aria-labelledby="team-title">
+    <div class="team-intro">
+        <h1 id="team-title">Команда ИБ</h1>
+        <p>
+            Мы развиваем компетенции в информационной безопасности, делимся опытом и поддерживаем друг друга в проектах технопарка.
+        </p>
+        <div class="team-ar-cta">
+            <a class="btn primary ar-button" href="{{ url_for('team_ar') }}">AR</a>
+            <p class="ar-hint">Хотите AR-опыт? Наведите камеру на маркеры и встретьтесь с командой в дополненной реальности.</p>
+        </div>
+    </div>
+    <div class="team-grid" aria-label="Карточки участников">
+        {% for member in team_members %}
+        <article class="team-card" aria-labelledby="member-{{ member.key }}-name">
+            <img class="avatar" src="{{ url_for('static', filename='images/team/' ~ member.image) }}" alt="{{ member.name }}">
+            <h2 id="member-{{ member.key }}-name">{{ member.name }}</h2>
+            <div class="role">{{ member.role }}</div>
+            <p class="bio">{{ member.bio }}</p>
+            {% if member.socials %}
+            <div class="links" aria-label="Социальные сети">
+                {% for social in member.socials %}
+                <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer">{{ social.label }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

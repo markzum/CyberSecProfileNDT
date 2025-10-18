@@ -380,6 +380,28 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.team-ar-cta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.team-ar-cta .ar-button {
+    font-size: 1.2rem;
+    padding: 1.1rem 3rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.team-ar-cta .ar-hint {
+    margin: 0;
+    max-width: 340px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
 .team-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -418,18 +440,13 @@ body {
 }
 
 .avatar {
-    width: 92px;
-    height: 92px;
-    border-radius: 22px;
-    background-size: cover;
-    background-position: center;
+    width: clamp(120px, 22vw, 156px);
+    height: clamp(120px, 22vw, 156px);
+    border-radius: 26px;
+    display: block;
+    object-fit: cover;
     border: 2px solid rgba(230, 0, 38, 0.4);
     box-shadow: var(--shadow-glow);
-}
-
-.team-card h2 {
-    margin: 0;
-    font-size: 1.5rem;
 }
 
 .team-card .role {
@@ -624,6 +641,15 @@ body {
 
     .ar-card-deck {
         grid-template-columns: 1fr;
+    }
+
+    .team-ar-cta {
+        gap: 1rem;
+    }
+
+    .team-ar-cta .ar-button {
+        width: 100%;
+        justify-content: center;
     }
 }
 
